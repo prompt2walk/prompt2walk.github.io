@@ -1,1 +1,192 @@
-To be appeared.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="main.css">
+    <link rel="icon" type="image/x-icon" href="assets/icon.png">
+    <title>Prompt a Robot to Walk with Large Language Models</title>
+</head>
+<body>
+<div id="title_slide">
+    <div class="title_left">
+        <h1>Prompt a Robot to Walk with Large Language Models</h1>
+        <div class="author-container">
+            <div class="grid-item"><a href="https://wangyenjen.github.io">Yen-Jen Wang<sup>1</sup></a></div>
+            <div class="grid-item"><a href="https://bikezhang106.github.io/">Bike Zhang<sup>2</sup></a></div>
+            <div class="grid-item"><a href="http://people.iiis.tsinghua.edu.cn/~jychen/">Jianyu Chen<sup>1,3</sup></a></div>
+            <div class="grid-item"><a href="https://hybrid-robotics.berkeley.edu/koushil/">Koushil Sreenath<sup>2</sup></a></div>
+        </div>
+        <div class="berkeley">
+            <!-- <p><sup>1</sup>Tsinghua University <sup>2</sup>University of California, Berkeley</p> -->
+            <img src="assets/logo.png" alt="logo", width="35%" height="35%">
+        </div>
+        <div class="button-container">
+            <a href="https://arxiv.org/abs/2309.09969" class="button">Paper</a>
+            <a href="https://github.com/HybridRobotics/prompt2walk" class="button">Code</a>
+        </div>
+
+        <br>
+        <br>
+        <div class="teaser">
+            <img src="assets/demo.png" alt="demo", width="40%" height="40%">
+        </div>
+
+        <div id="abstract" class="grid-container">
+            <p>
+                Large language models (LLMs) pre-trained on vast internet-scale data have showcased remarkable capabilities across diverse domains. Recently, there has been escalating interest in deploying LLMs for robotics, aiming to harness the power of foundation models in real-world settings. However, this approach faces significant challenges, particularly in grounding these models in the physical world and in generating dynamic robot motions. To address these issues, we introduce a novel paradigm in which we use few-shot prompts collected from the physical environment, enabling the LLM to autoregressively generate low-level control commands for robots without task-specific fine-tuning. Experiments across various robots and environments validate that our method can effectively prompt a robot to walk. We thus illustrate how LLMs can proficiently function as low-level feedback controllers for dynamic motion control even in high-dimensional robotic systems.
+            </p>
+        </div>
+    </div>
+</div>
+<hr class="rounded">
+<div id="overview">
+
+    <h1>Overview</h1>
+    <br>
+    <div class="approach">
+        <img src="assets/method.png" alt="method", width="45%" height="45%">
+    </div>
+    <p>
+        We first collect data from an existing controller to initialize the LLM policy. Then, we design a text prompt including a description prompt and an observation and action prompt. The LLM outputs normalized target joint positions that are then tracked by a PD controller. After each LLM inference loop, the prompt is updated with the historical observations and actions. In our experiment, the LLM is supposed to run at 10 Hz although the simulation has to be paused to wait for LLM inference, and the PD controller executes at 200 Hz.
+    </p>
+
+    <h1>Can we directly use a prompt to make LLM achieve low-level control?</h1>
+    <p>
+        Yes! Grounded in a physics-based simulator, LLMs output target joint positions to enable a robot to walk given a text prompt.
+        The following video shows the A1 quadrupedal robot walking on a flat ground in MuJoCo simulator.
+    </p>
+    <br>
+    <div class="allegrofail">
+        <div class="video_container">
+            <video autoplay muted playsinline loop preload="metadata">
+                <source src="assets/a1_flat.mp4" type="video/mp4">
+            </video>
+            <div class="caption">
+                <p>A1 quadrupedal robot walking on a flat ground</p>
+            </div>
+        </div>
+    </div>
+    <p>
+        Due to the need to balance the token limit of the LLM and the size of P<sub>Hist</sub>, we execute the policy at 10 Hz. However, this leads to a  walking gait that becomes reasonably worse compared to many RL-based walking policies running at 50 Hz or even higher.
+        All videos were produced through post-production rendering and are not in real-time.
+    </p>
+
+    <h1>Does the proposed approach generalize to different robots and environments?</h1>
+    <p>
+        To answer this question, we test our method on a variety of robots and environments. The following videos show the A1 quadrupedal robot walking on an uneven terrain in MuJoCo simulator and the ANYmal quadrupedal robot walking on a flat ground in Isaac Gym simulator.
+    </p>
+    <br>
+    <div class="allegrolower">
+        <div class="video_container">
+            <video autoplay muted playsinline loop preload="metadata">
+                <source src="assets/anymal.mp4" type="video/mp4">
+            </video>
+            <div class="caption">
+                <p>ANYmal quadrupedal robot walking on a flat ground in Isaac Gym</p>
+            </div>
+        </div>
+        <div class="video_container">
+            <video autoplay muted playsinline loop preload="metadata">
+                <source src="assets/a1_uneven.mp4" type="video/mp4">
+            </video>
+            <div class="caption">
+                <p>A1 quadrupedal robot walking on an uneven terrain in MuJoCo</p>
+            </div>
+        </div>
+    </div>
+
+    <h1>How should we design prompts for robot walking?</h1>
+    <br>
+    <div class="approach">
+        <img src="assets/prompt.png" alt="prompt", width="45%" height="45%">
+    </div>
+    <p>We design a text prompt that includes two parts: a description prompt and an observation and action prompt. In the description prompt, we have the following subparts: P<sub>TD</sub>: task description, P<sub>IO</sub>: meaning of input and output space, P<sub>JO</sub>: joint order, P<sub>CP</sub>: full control pipeline, P<sub>AI</sub>: additional illustration. In the observation and action prompt, we have P<sub>Hist</sub>: historical observations and actions. The LLM outputs normalized target joint positions.</p>
+
+    <h1>The LLM policy can make a robot recover from terrain disturbance</h1>
+    <p>
+        The A1 robot is prompted to walk on uneven terrain in MuJoCo, where the LLM policy can make it recover from terrain disturbance.
+    </p>
+    <br>
+    <div class="allegrofail">
+        <div class="video_container">
+            <video autoplay muted playsinline loop preload="metadata">
+                <source src="assets/recover.mp4" type="video/mp4">
+            </video>
+            <div class="caption">
+                <p>The LLM policy can make the A1 robot recover from terrain disturbance</p>
+            </div>
+        </div>
+    </div>
+
+    <h1>Want more details?</h1>
+    <p>Please read our paper! 
+        If you have further questions, please feel free to contact <a href="https://wangyenjen.github.io/" style="color: #006aff;">Yen-Jen</a>.
+    </p>
+
+    <h1>BibTeX</h1>
+    <p class="bibtex">
+        @misc{wang2023prompt,<br>
+        &nbsp;&nbsp;title={Prompt a Robot to Walk with Large Language Models},<br>
+        &nbsp;&nbsp;author={Yen-Jen Wang and Bike Zhang and Jianyu Chen and Koushil Sreenath},<br>
+        &nbsp;&nbsp;year={2023},<br>
+        &nbsp;&nbsp;eprint={2309.09969},<br>
+        &nbsp;&nbsp;archivePrefix={arXiv},<br>
+        &nbsp;&nbsp;primaryClass={cs.RO}<br>
+        }
+    </p>
+
+    <h1>Acknowledgements</h1>
+    <p>
+        This work is supported in part by the InnoHK of the Government of the Hong Kong Special Administrative Region via the Hong Kong Centre for Logistics Robotics. The website template is from <a href="https://humanoid-transformer.github.io/" style="color: #006aff;">Learning Humanoid Locomotion with Transformers</a>.
+    </p>
+</div>
+<script type="text/javascript">
+    /* https://stackoverflow.com/questions/3027707/how-to-change-the-playing-speed-of-videos-in-html5 */
+    document.querySelector('video').defaultPlaybackRate = 1.0;
+    document.querySelector('video').play();
+
+    var videos =document.querySelectorAll('video');
+    for (var i=0;i<1;i++)
+    {
+        videos[i].playbackRate = 1.0;
+    }
+</script>
+<script>
+    /* https://stackoverflow.com/questions/21163756/html5-and-javascript-to-play-videos-only-when-visible */
+    var videos = document.getElementsByTagName("video");
+
+    function checkScroll() {
+        var fraction = 0.5; // Play when 70% of the player is visible.
+
+        for(var i = 0; i < 1; i++) {  // only apply to the first video
+
+            var video = videos[i];
+
+            var x = video.offsetLeft, y = video.offsetTop, w = video.offsetWidth, h = video.offsetHeight, r = x + w, //right
+                b = y + h, //bottom
+                visibleX, visibleY, visible;
+
+            visibleX = Math.max(0, Math.min(w, window.pageXOffset + window.innerWidth - x, r - window.pageXOffset));
+            visibleY = Math.max(0, Math.min(h, window.pageYOffset + window.innerHeight - y, b - window.pageYOffset));
+
+            visible = visibleX * visibleY / (w * h);
+
+            if (visible > fraction) {
+                video.play();
+            } else {
+                video.pause();
+            }
+
+        }
+
+    }
+    window.addEventListener('scroll', checkScroll, false);
+    window.addEventListener('resize', checkScroll, false);
+</script>
+<script src="https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=51e0d73d83d06baa7a00000f"
+        type="text/javascript" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+        crossorigin="anonymous"></script>
+<script src="https://uploads-ssl.webflow.com/51e0d73d83d06baa7a00000f/js/webflow.fd002feec.js"
+        type="text/javascript"></script>
+</body>
+</html>
