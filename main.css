@@ -366,6 +366,26 @@ hr.rounded {
     border-radius: 0.5vw;
 }
 
+.teaser > .video_container > img {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+    border-radius: 0.5vw;
+}
+
+.berkeley > .video_container {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 40%;
+}
+
+.berkeley > .video_container > img {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+    border-radius: 0.5vw;
+}
+
 .approach {
     margin-left: auto;
     margin-right: auto;
@@ -378,6 +398,11 @@ hr.rounded {
 }
 
 .approach > .video_container > video {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.approach > .video_container > img {
     max-width: 100%;
     max-height: 100%;
 }

@@ -28,7 +28,9 @@
 
         <div class="berkeley">
             <!-- <p><sup>1</sup>Tsinghua University <sup>2</sup>University of California, Berkeley</p> -->
-            <img src="assets/logo.png" alt="logo", width="35%" height="35%">
+            <div class="video_container">
+                <img src="assets/logo.png" alt="logo">
+            </div>
         </div>
         <div class="button-container">
             <a href="https://arxiv.org/abs/2309.09969" class="button">Paper</a>
@@ -38,7 +40,9 @@
         <br>
         <br>
         <div class="teaser">
-            <img src="assets/demo.png" alt="demo", width="40%" height="40%">
+            <div class="video_container">
+                <img src="assets/demo.png" alt="demo">
+            </div>
         </div>
 
         <div id="abstract" class="grid-container">
@@ -54,7 +58,9 @@
     <h1>Overview</h1>
     <br>
     <div class="approach">
-        <img src="assets/method.png" alt="method", width="45%" height="45%">
+        <div class="video_container">
+            <img src="assets/method.png" alt="method">
+        </div>
     </div>
     <p>
         We first collect data from an existing controller to initialize the LLM policy. Then, we design a text prompt including a description prompt and an observation and action prompt. The LLM outputs normalized target joint positions that are then tracked by a PD controller. After each LLM inference loop, the prompt is updated with the historical observations and actions. In our experiment, the LLM is supposed to run at 10 Hz although the simulation has to be paused to wait for LLM inference, and the PD controller executes at 200 Hz.
@@ -108,7 +114,9 @@
     <h1>How should we design prompts for robot walking?</h1>
     <br>
     <div class="approach">
-        <img src="assets/prompt.png" alt="prompt", width="45%" height="45%">
+        <div class="video_container">
+            <img src="assets/prompt.png" alt="prompt">
+        </div>
     </div>
     <p>We design a text prompt that includes two parts: a description prompt and an observation and action prompt. In the description prompt, we have the following subparts: P<sub>TD</sub>: task description, P<sub>IO</sub>: meaning of input and output space, P<sub>JO</sub>: joint order, P<sub>CP</sub>: full control pipeline, P<sub>AI</sub>: additional illustration. In the observation and action prompt, we have P<sub>Hist</sub>: historical observations and actions. The LLM outputs normalized target joint positions.</p>
 
